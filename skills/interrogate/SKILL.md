@@ -15,7 +15,7 @@ The scope is what the user names. Otherwise it is the branch diff from its merge
 
 Run Phase A steps 3 and 4 and Phase B of the **arena** skill, with four changes:
 
-1. Read `interrogate reviewers` from `~/.gemini/config/pstack-models.md` (default `gemini-4-neon-high`, `claude-opus-5-5-high`, `gemini-4-hydrogen-high`) in place of `arena runners`.
+1. Read `interrogate reviewers` from `~/.gemini/config/pstack-models.md` in place of `arena runners`. When unconfigured, default to distinct Gemini families (`gemini-4-carbon-high`, `gemini-4-neon-high`, `gemini-4-hydrogen-high`, falling back to `gemini-4-neon-high`, `gemini-4-hydrogen-high`, `gemini-4-argon-high` on plans without Carbon) so heavy adversarial repro runs don't burn through tight Claude allowances on Google plans. Users can opt Claude into `interrogate reviewers` via `/setup-pstack` or request a Claude adversary explicitly for high-stakes diffs.
 2. Give each adversary an isolated workspace (`workspace:"share"` in `swarm` or `run_workflow`). If the scope includes uncommitted working-tree changes that the shared workspace does not inherit, pass a patch file path (for example in `<appDataDir>/brain/<conversation-id>/scratch/scope.patch`) and tell each adversary to apply it in its workspace before testing.
 3. Spawn each adversary cleanly (via `swarm{action:"add", name:"adversary-<n>", model:"<slug>", workspace:"share", brief:...}` for multi-model panels, or `run_workflow` `parallel()` when every entry is `inherit`).
 4. In place of the arena task and rationale, give each adversary the scope, the intent, and this brief:

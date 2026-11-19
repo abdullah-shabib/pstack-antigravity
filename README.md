@@ -6,7 +6,7 @@ A maintained, native Google Antigravity port of [Lauren Tan's (`poteto`) `pstack
 
 ## What's native to Google Antigravity
 
-- **Native model discovery & multi-vendor panels:** `/setup-pstack` queries `swarm{action:"models", all:true}` for live Antigravity slugs and quotas (`gemini-4-neon-*`, `gemini-4-hydrogen-*`, `gemini-4-argon-*`, `gemini-3.8-flash-*`, `claude-opus-5-5-*`, `claude-sonnet-5-5-*`, `gpt-oss-120b-medium`) plus subagent tiers (`inherit`, `pro`, `flash`, `flash_lite`), and writes `~/.gemini/config/pstack-models.md`.
+- **Native model discovery & multi-vendor panels:** `/setup-pstack` queries `swarm{action:"models", all:true}` for live Antigravity slugs and quotas across whatever models your plan provides (model access varies by plan — see [Antigravity Models](https://antigravity.google/docs/models/)), plus subagent tiers (`inherit`, `pro`, `flash`, `flash_lite`), and writes `~/.gemini/config/pstack-models.md`.
 - **Two parallel execution engines:** `run_workflow` (`parallel()`, `pipeline()`, `phase()`, typed JSON `schema`) for deterministic slice fan-outs via `/pstack-swarm`, and native `swarm` (`workspace:"share"`) for multi-vendor `/arena` bakeoffs and `/interrogate` adversarial reviews.
 - **Built-in `swarm` preserved:** upstream's `/swarm` is shipped here as [`/pstack-swarm`](./skills/pstack-swarm/SKILL.md) so Antigravity's built-in `swarm` skill is never shadowed.
 - **First-class Antigravity primitives:** `invoke_subagent` with `Workspace: "share"` / `"branch"`, built-in `research` for read-only `/how` & transcript scans, built-in `browser` subagent for live UI verification, `schedule` + `/goal` for overnight loops, `ask_question` for interactive flows, and native `<appDataDir>/brain/` transcript auditing.
@@ -39,7 +39,7 @@ Two steps:
 
 New here? Read the [pstack guide](./docs/guide/README.md) or ask [`/poteto-help`](./skills/poteto-help/SKILL.md) without starting any work.
 
-Out of the box (at the default `large` budget), `invoke_subagent` / `run_workflow` code and judgment delegates use `inherit` (`flash` for routine scans), exact Swarm code delegates default to `gemini-4-neon-xhigh`, and multi-vendor panels (`/arena`, `/interrogate`) default to `gemini-4-neon-high`, `claude-opus-5-5-high`, and `gemini-4-hydrogen-high` with a cross-vendor judge pool (`claude-opus-5-5-high`, `gemini-4-neon-high`, `gpt-oss-120b-medium`). `/setup-pstack` customizes any of it.
+Out of the box (at the default `large` budget), pstack discovers your live models via `swarm{action:"models", all:true}` and picks the **strongest Gemini models available on your plan** while conserving tight Claude allowances: `invoke_subagent` / `run_workflow` code and judgment delegates use `inherit` (`flash` for routine scans), exact Swarm code delegates prefer `gemini-4-carbon` (falling back to `gemini-4-neon-xhigh`), heavy panels (`/arena` runners, `/interrogate` reviewers) default to distinct Gemini families, and Claude is reserved by default for single low-volume read-only cross-vendor judgment passes (`arena cross-judge pool` and `show-me-your-work` trail review, falling back automatically if Claude quota is low or unavailable). `/setup-pstack` refreshes or customizes any of it as Antigravity adds or retires models.
 
 ## Usage
 

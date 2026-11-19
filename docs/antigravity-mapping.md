@@ -27,10 +27,12 @@ This repository maintains a native Google Antigravity port of [cursor/plugins `p
 Antigravity exposes two complementary model selection surfaces, and `/setup-pstack` configures both in `~/.gemini/config/pstack-models.md`:
 
 1. **Subagent & Workflow tiers** (`invoke_subagent` `Model`, `run_workflow` `model`): `inherit`, `pro`, `flash`, `flash_lite`.
-2. **Exact Multi-Vendor Swarm slugs** (`swarm{action:"models", all:true}`): live-discovered exact slugs with effort suffixes (`xhigh`, `high`, `medium`, `low`) and live quota reporting across vendors:
-   - **Google (`gemini-*`)**: `gemini-4-neon-*`, `gemini-4-hydrogen-*`, `gemini-4-argon-*`, `gemini-3.8-flash-*`
-   - **Anthropic (`claude-*`)**: `claude-opus-5-5-*`, `claude-sonnet-5-5-*`
-   - **OpenAI / OSS (`gpt-*`)**: `gpt-oss-120b-medium`
+2. **Exact Multi-Vendor Swarm slugs** (`swarm{action:"models", all:true}`): live-discovered exact slugs with effort suffixes (`xhigh`, `high`, `medium`, `low`) and live quota reporting across vendors. Model access depends on your Antigravity plan and org policy (Free, Google AI Pro, Ultra, Enterprise — see https://antigravity.google/docs/models/), and models are added or retired over time. `/setup-pstack` and every multi-model skill resolve slugs live against `swarm{action:"models", all:true}` rather than relying on a fixed list:
+   - **Google (`gemini-*`)**: e.g. `gemini-4-carbon-*`, `gemini-4-neon-*`, `gemini-4-hydrogen-*`, `gemini-4-argon-*`, `gemini-3.8-flash-*` (and any newer generations added later)
+   - **Anthropic (`claude-*`, plan-dependent)**: e.g. `claude-opus-5-5-*`, `claude-sonnet-5-5-*` (and any newer generations added later)
+   - **Other vendors (plan-dependent)**: discovered dynamically from `swarm{action:"models", all:true}` by leading prefix
+   - **Claude quota conservation:** because third-party Claude allowances on Google Antigravity plans are very tight, defaults keep heavy code-generation, `/pstack-swarm`, `arena runners`, and `interrogate reviewers` on diverse Gemini families, and reserve Claude for single low-volume read-only cross-vendor judgment passes (`arena cross-judge pool` and `show-me-your-work` trail review) — falling back to a distinct Gemini family whenever Claude quota is low or depleted. Users can opt Claude into heavier panel seats anytime via `/setup-pstack`.
+   - **Forward/backward resilience:** newly added models are immediately selectable in `/setup-pstack`, and retired slugs in `~/.gemini/config/pstack-models.md` fall back automatically at runtime to the strongest live slug of the same family/vendor until you re-run `/setup-pstack`.
 
 ## Intentional Divergences from Upstream
 

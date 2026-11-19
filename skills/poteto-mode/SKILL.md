@@ -86,19 +86,19 @@ Pick the Antigravity primitive that fits the job:
 
 - **Single focused delegate** → `invoke_subagent` with `TypeName: "poteto-agent"` (or `TypeName: "research"` for read-only codebase exploration, `TypeName: "browser"` for live web/UI verification, `TypeName: "comment-sicko"` for `/no-comments`). Pass `Workspace: "share"` whenever a delegate edits or builds concurrently with other work, and `Workspace: "branch"` for a fully isolated clone. Subagents run in the background automatically and wake you when done.
 - **Programmatic fan-out / staged pipelines** → `run_workflow` with `parallel()`, `pipeline()`, `phase()`, and typed `schema` outputs. Pass `workspace="share"` for parallel editors and `model="flash"` / `"flash_lite"` for high-fan-out scans.
-- **Multi-model / cross-vendor panels or races** → Antigravity's native `swarm` tool (`swarm{action:"add", name, brief, model, workspace:"share"}`), which pins exact cross-vendor slugs (`gemini-4-neon-*`, `claude-opus-5-5-*`, `gemini-4-hydrogen-*`, `gpt-oss-120b-medium`).
+- **Multi-model / cross-vendor panels or races** → Antigravity's native `swarm` tool (`swarm{action:"add", name, brief, model, workspace:"share"}`), which pins exact cross-vendor slugs discovered live via `swarm{action:"models", all:true}`.
 
 The chat that receives `/poteto-mode` runs the playbook itself. Never spawn `poteto-agent` to own the whole playbook. Routed workflow skills (`arena`, `pstack-swarm`, `interrogate`) choose their own orchestration primitive and agent type. Respect them.
 
 **Model configuration.** Read `~/.gemini/config/pstack-models.md` if it exists (written by `/setup-pstack`). Its lines override the defaults below and the role defaults in routed skills (`arena`, `pstack-swarm`, `interrogate`). A role with no line keeps its default:
 
 - Subagent / workflow tiers (`invoke_subagent`, `run_workflow`): `inherit` for code and judgment, `flash` for routine scans and bulk transcript mining.
-- Code delegates via Swarm (`feature, refactoring`, `bug-fix`, `perf-issue`, `hillclimb`): `gemini-4-neon-xhigh`.
-- Judgment, prose, and `pstack-swarm` workers via Swarm: `gemini-4-neon-high`.
-- Diverse review and design panels (`arena runners`, `interrogate reviewers`): `gemini-4-neon-high`, `claude-opus-5-5-high`, `gemini-4-hydrogen-high`.
-- Cross-vendor judge pool (`arena cross-judge pool`): `claude-opus-5-5-high`, `gemini-4-neon-high`, `gpt-oss-120b-medium`.
+- Code delegates via Swarm (`feature, refactoring`, `bug-fix`, `perf-issue`, `hillclimb`): strongest available flagship (`gemini-4-carbon-xhigh` / highest `gemini-4-carbon-*` if on your plan, else `gemini-4-neon-xhigh`).
+- Judgment, prose, and `pstack-swarm` workers via Swarm: `gemini-4-carbon-high` if available, else `gemini-4-neon-high`.
+- Diverse review and design panels (`arena runners`, `interrogate reviewers`): distinct Gemini families by default to protect tight Claude allowances on Google plans (`gemini-4-carbon-high`, `gemini-4-neon-high`, `gemini-4-hydrogen-high`; or `gemini-4-neon-high`, `gemini-4-hydrogen-high`, `gemini-4-argon-high` on plans without Carbon). Users can opt Claude into panel lists via `/setup-pstack`.
+- Cross-vendor judge pool (`arena cross-judge pool`): reserves Claude (when enabled and quota allows) for one low-volume read-only judgment pass (`claude-opus-5-5-high`, `gemini-4-carbon-high`, `gemini-4-neon-high`).
 
-Check live availability and quota with `swarm{action:"models", all:true}` before pinning exact Swarm slugs. If a configured slug is out of quota or rejected, switch or fall back to the next valid slug of the same family (or omit `model` to inherit the parent model) and say so.
+Always check live availability and `quota_remaining` with `swarm{action:"models", all:true}` before pinning exact Swarm slugs. Claude usage limits are tight on Google plans: never spend Claude on routine or heavy code-generation delegates unless the user explicitly configured or requested it, and if a Claude seat is out of quota or critically low, fall back to a distinct Gemini family. If any configured slug was retired, removed, or is out of quota, never pass the dead slug — substitute the strongest live slug of the same family, then the same vendor (or a distinct Gemini family when third-party quota is depleted), then omit `model` to inherit the parent model, note the substitution once, and suggest re-running `/setup-pstack` to refresh `~/.gemini/config/pstack-models.md`.
 
 You own every delegate's work. Review the diff and write your own summary. A second opinion is the same prompt on another vendor's model.
 

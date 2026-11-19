@@ -43,7 +43,7 @@ const BUILTIN_ANTIGRAVITY_SKILLS = new Set([
 ]);
 const SKILL_NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const STRAY_CURSOR_RE =
-  /\.cursor\/|pstack-models\.mdc|AskQuestion|generalPurpose|run_in_background|cloud_base_branch|file_attachments|claude-fable|gemini-4-carbon|cursor-team-kit|\/add-plugin|Custom Mode|agent-transcripts|api2\.cursor\.sh|SendToUser|xhigh-fast|high-fast|medium-fast|disable-model-invocation|cloud (sub)?agent/gi;
+  /\.cursor\/|pstack-models\.mdc|AskQuestion|generalPurpose|run_in_background|cloud_base_branch|file_attachments|claude-fable|gpt-oss-120b|claude-(?:opus|sonnet)-4-6|cursor-team-kit|\/add-plugin|Custom Mode|agent-transcripts|api2\.cursor\.sh|SendToUser|xhigh-fast|high-fast|medium-fast|disable-model-invocation|cloud (sub)?agent/gi;
 const LEAK_RE = /\/Users\/[a-z0-9_-]+|\/tmp\/cursor-plugins/g;
 const LINK_RE = /\]\(<?([^)\s>]+)>?(?:\s+"[^"]*")?\)/g;
 

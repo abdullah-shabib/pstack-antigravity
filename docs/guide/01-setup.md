@@ -20,15 +20,15 @@ Run:
 /setup-pstack
 ```
 
-[`/setup-pstack`](../../skills/setup-pstack/SKILL.md) calls `swarm{action:"models", all:true}` to detect the exact models and live quotas available in your Antigravity account, asks for a reasoning budget, shows you each role (subagent tiers, code delegates, judgment, and multi-vendor review panels), and asks what you want. Answer the questions. It writes `~/.gemini/config/pstack-models.md`, a standalone config file every pstack skill reads on demand.
+[`/setup-pstack`](../../skills/setup-pstack/SKILL.md) calls `swarm{action:"models", all:true}` to detect the exact models and live quotas available on your Antigravity plan (model access varies across Free, Google AI Pro, Ultra, and Enterprise plans — see https://antigravity.google/docs/models/), asks for a reasoning budget, shows you each role (subagent tiers, code delegates, judgment, and review panels), and writes `~/.gemini/config/pstack-models.md`, a standalone config file every pstack skill reads on demand.
 
-The defaults match the `large` budget:
+The defaults match the `large` budget and pick the **strongest models available on your Antigravity plan** (ignoring cost/speed upfront; use `medium`, `small`, or `inherit` when you want to conserve quota):
 
 - Subagent and `run_workflow` tiers: `inherit` for code and judgment, `flash` for routine scans.
-- Exact Swarm code delegates: `gemini-4-neon-xhigh`.
-- Judgment, prose, and `/pstack-swarm` workers: `gemini-4-neon-high`.
-- Multi-vendor panels (`arena runners`, `interrogate reviewers`): `gemini-4-neon-high`, `claude-opus-5-5-high`, and `gemini-4-hydrogen-high`.
-- Cross-vendor judge pool (`arena cross-judge pool`): `claude-opus-5-5-high`, `gemini-4-neon-high`, `gpt-oss-120b-medium`.
+- Exact Swarm code delegates: `gemini-4-carbon-xhigh` (or highest available `gemini-4-carbon-*`) → `gemini-4-neon-xhigh` → strongest detected Gemini model on your plan.
+- Judgment, prose, and `/pstack-swarm` workers: `gemini-4-carbon-high` → `gemini-4-neon-high` → strongest detected Gemini model.
+- Multi-model panels (`arena runners`, `interrogate reviewers`): defaults to distinct **Gemini** families (`gemini-4-carbon-high`, `gemini-4-neon-high`, `gemini-4-hydrogen-high`; or `gemini-4-neon-high`, `gemini-4-hydrogen-high`, `gemini-4-argon-high` on plans without Carbon) so heavy parallel runs don't burn through tight Claude allowances on Google plans. You can opt Claude into panel lists during `/setup-pstack` if you want.
+- Cross-vendor judge pool (`arena cross-judge pool`): reserves Claude (when enabled and in-quota) for one low-volume read-only judgment pass (`claude-opus-5-5-high`, `gemini-4-carbon-high`, `gemini-4-neon-high`), falling back cleanly to a distinct Gemini family when Claude quota is depleted or unavailable.
 
 No role runs above `xhigh`. `medium` lowers each role one step (`xhigh` → `high`, `high` → `medium`) and `small` lowers it two steps, spending less quota.
 
