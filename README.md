@@ -1,5 +1,5 @@
-<p align="left">
-  <img src="./assets/logo.png" alt="pstack logo" width="96" />
+<p align="center">
+  <img src="./assets/social-preview.png" alt="pstack — Antigravity port" width="100%" />
 </p>
 
 # pstack for Google Antigravity
