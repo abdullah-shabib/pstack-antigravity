@@ -10,9 +10,13 @@ With the Antigravity CLI:
 agy plugin install https://github.com/abdullah-shabib/pstack-antigravity
 ```
 
-Or in the **Skills & Customizations** sidebar → **Plugins** → install from GitHub URL (`https://github.com/abdullah-shabib/pstack-antigravity`), choosing Global or Workspace scope.
+Or clone directly into your global or workspace plugins directory:
 
-You can also clone directly into `~/.gemini/config/plugins/pstack` (or register it in `~/.gemini/config/plugins.json` / `.agents/plugins.json`). Antigravity discovers it automatically and loads its skills on the next turn.
+```bash
+git clone https://github.com/abdullah-shabib/pstack-antigravity.git ~/.gemini/config/plugins/pstack
+```
+
+Antigravity discovers the plugin automatically on the next turn and shows it under **Customizations → Installed** (where you can toggle it on/off or uninstall it). The **Customizations → Marketplace** tab only installs Marketplace catalog plugins, so GitHub plugins use `agy plugin install` or `git clone`.
 
 ## Pick your models
 

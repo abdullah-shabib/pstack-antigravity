@@ -15,25 +15,29 @@ See [docs/antigravity-mapping.md](./docs/antigravity-mapping.md) for the complet
 
 ## Install
 
-**Antigravity CLI (easiest):**
+**Antigravity CLI:**
 
 ```bash
 agy plugin install https://github.com/abdullah-shabib/pstack-antigravity
 ```
 
-**Customizations tab (GUI):**
-
-1. Open **Skills & Customizations** in the Antigravity sidebar → **Plugins**.
-2. Install from GitHub URL: `https://github.com/abdullah-shabib/pstack-antigravity`.
-3. Choose **Global** (`~/.gemini/config/plugins/`) or **Workspace** (`.agents/plugins/`).
-
-**Manual `git clone` (or symlink for development):**
+**Or clone directly into Antigravity's plugins folder:**
 
 ```bash
+# Global (all workspaces)
 git clone https://github.com/abdullah-shabib/pstack-antigravity.git ~/.gemini/config/plugins/pstack
+
+# Or workspace-only (single repo)
+git clone https://github.com/abdullah-shabib/pstack-antigravity.git .agents/plugins/pstack
 ```
 
-Antigravity discovers the plugin automatically and loads its skills on the next turn.
+Antigravity discovers the plugin automatically on the next turn, and it will appear under **Customizations → Installed** where you can toggle it on/off or uninstall it. (The **Customizations → Marketplace** tab only lists published Marketplace plugins; GitHub repos install via `agy plugin install` or `git clone`.)
+
+To update a cloned install later:
+
+```bash
+git -C ~/.gemini/config/plugins/pstack pull
+```
 
 ## Get started
 
