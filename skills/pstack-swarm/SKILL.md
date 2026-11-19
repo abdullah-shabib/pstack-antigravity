@@ -26,7 +26,11 @@ This skill is named `pstack-swarm` so it coexists cleanly with Google Antigravit
 Launch all N workers concurrently:
 
 - **With `run_workflow`:** pass `parallel(slices, lambda s: agent(..., schema=RESULT_SCHEMA, role=f"Check {s}", workspace=..., model=...))`.
-- **With native `swarm`:** name the swarm with `swarm{action:"title"}`, then spawn workers with `swarm{action:"add", name, tasks/brief, model, workspace:"share"}` (or `workspace:"inherit"` for read-only workers). Have each worker post `@coordinator [done]` with its structured verdict. Wait with `swarm_wait`.
+- **With native `swarm`:**
+  1. Name the swarm (`swarm{action:"title"}`) and add all workers in the same turn using `swarm{action:"add", name, brief, model, workspace:"share"}` (use `tasks:[...]` for sharded slices `<name>-1`..`<name>-<k>`, `workspace:"inherit"` for read-only workers, and `fork:"coordinator"` when workers need warm conversation context; for large swarms past ~8 workers, group by `channel` and optionally add a `monitor` worker if `swarm_monitor` is available). Instruct each worker to post `@coordinator [done]` with its structured verdict.
+  2. Write `<appDataDir>/brain/<conversation-id>/.system_generated/swarm/plan.json` (per Antigravity's built-in `swarm_pane` schema: `goal`, `tasks`, `threads`) so the Swarm UI Overview tracks every slice cleanly. Do not add a narrator.
+  3. End the creation turn with the `open_board` value from `swarm{action:"add"}` on its own line so the user can open the live Swarm pane. Board tools (`post_message`, `read_board`, `swarm_wait`) appear on the turn *after* the first `swarm add`, so wait reactively or call `swarm_wait{since:<last-seq>}` starting on the following turn.
+  4. If any worker hits quota mid-run, switch its model in place with `swarm{action:"model", name, model}` (preserving its conversation) instead of killing and re-adding it.
 
 Every brief stands alone. Include the goal, scope, exact slice or race arm, how to verify, and what to report. Reports use `PASS`, `ISSUES`, or `BLOCKED` with evidence. A worker that can prove a defect reports `ISSUES` and lists every issue it can prove, not only the first.
 

@@ -25,7 +25,11 @@ Every candidate gets the same prompt, so the prompt is the contract.
 
 Launch all N candidates in parallel in one turn:
 
-- **Via `swarm` (multi-model):** name the swarm (`swarm{action:"title", title:"arena: <slug>"}`), then call `swarm{action:"add", name:"candidate-<n>", model:"<slug>", workspace:"share", brief:...}` for each candidate (omit `model` for `inherit` entries). Instruct each candidate to post `@coordinator [done]` with its artifact path, commit/diff summary, and short rationale naming alternatives considered and rejected. Wait with `swarm_wait` until all candidates report.
+- **Via `swarm` (multi-model):**
+  1. Name the swarm (`swarm{action:"title", title:"arena: <slug>"}`) and call `swarm{action:"add", name:"candidate-<n>", model:"<slug>", workspace:"share", brief:...}` for every candidate in the same turn (omit `model` for `inherit` entries; pass `fork:"coordinator"` if candidates need warm conversation context). Instruct each candidate to post `@coordinator [done]` with its artifact path, commit/diff summary, and short rationale naming alternatives considered and rejected (plus `Screenshot: <abs-path> | <caption>` under its `<appData>/brain/<conv-id>/` folder for visible UI work).
+  2. Write `<appDataDir>/brain/<conversation-id>/.system_generated/swarm/plan.json` (per Antigravity's built-in `swarm_pane` schema: `goal`, `tasks`, `threads`) so the Swarm UI's Overview tab displays the arena goal and candidates cleanly. Do not add a narrator.
+  3. End this turn with the `open_board` value returned by `swarm{action:"add"}` on its own line so the user gets the one-click Swarm UI pill. Board tools (`post_message`, `read_board`, `swarm_wait`) appear on the next turn — wait reactively or call `swarm_wait{since:<last-seq>}` starting on the following turn.
+  4. If a waiting candidate hits quota mid-run, switch its model in place with `swarm{action:"model", name, model}` so it keeps its conversation and resumes instead of calling `kill` + `add`.
 - **Via `run_workflow` (single-model / `inherit`):** use `parallel()` over the candidate list with `workspace="share"` and a structured `schema` returning `{artifact_path, summary, rationale}`.
 
 Every candidate gets the identical task, the path to shared grounding, its own output path, and instructions to produce the artifact plus a short rationale.
@@ -38,7 +42,7 @@ After all Phase B candidates complete, spawn one read-only judge from the `arena
 
 - The judge must come from a vendor different from the parent chat's vendor (derive vendor from the leading prefix: `gemini-*` = Google, `claude-*` = Anthropic, any other prefix = its own vendor). Skip any retired or out-of-quota entry and pick the first live entry from another vendor.
 - An `inherit` entry never cross-judges. If the user's Antigravity plan exposes only one vendor (for example a Google-only or Free plan), or no other-vendor model has remaining quota, either spawn a distinct model family on the same vendor and note that it is cross-family rather than cross-vendor, or skip Phase C and state why. If you do not know the parent's vendor, use the first real slug and note that the vendor check did not run.
-- Spawn the judge via `swarm{action:"add", name:"judge", model:"<judge-slug>", workspace:"inherit", brief:...}` with explicit read-only instructions ("do not edit files"). Give it the rubric and each candidate's sanitized path label (`candidate-1`, `candidate-2`, ...) without revealing model names.
+- Spawn the judge via `swarm{action:"add", name:"judge", model:"<judge-slug>", workspace:"inherit", brief:...}` with explicit read-only instructions ("do not edit files") and update `plan.json` to include `judge`. Give it the rubric and each candidate's sanitized path label (`candidate-1`, `candidate-2`, ...) without revealing model names. If the judge hits quota mid-run, switch it in place with `swarm{action:"model", name:"judge", model:"<next-pool-slug>"}`.
 - While you read in Phase D, the judge scores each candidate on each rubric criterion and recommends a base.
 
 ## Phase D: Pick a base

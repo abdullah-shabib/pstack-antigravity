@@ -12,7 +12,7 @@ This repository maintains a native Google Antigravity port of [cursor/plugins `p
 | `Task` with `run_in_background: true` | Default behavior for `invoke_subagent`, `run_workflow`, and `swarm` |
 | `Task` with `resume` | `send_message` to the existing subagent `conversationId` |
 | `AskQuestion` | Native `ask_question` tool |
-| Multi-model `arena` / `interrogate` / cross-judge | Native `swarm` tool (`swarm{action:"models", all:true}` + `swarm{action:"add", model, workspace:"share"}`) |
+| Multi-model `arena` / `interrogate` / cross-judge | Native `swarm` tool (`swarm{action:"models", all:true}`, `swarm{action:"add", model, workspace:"share"}`, `open_board` UI pill, `.system_generated/swarm/plan.json` Overview via `swarm_pane`, and in-place `swarm{action:"model"}` quota switching) |
 | Deterministic `/swarm` fan-out & races | Renamed `/pstack-swarm` (avoids shadowing Antigravity's built-in `swarm` skill); uses `run_workflow` (`parallel()`, `pipeline()`, `phase()`, typed `schema`) and native `swarm` for multi-model races |
 | `control-ui` (`cursor-team-kit`) | Antigravity's built-in `browser` subagent + project-local `.agents/skills/verify-<app>/` |
 | `/loop` & Cursor Automations | Native `schedule` tool (one-shot timers + recurring cron), `/goal`, `/schedule`, and built-in `automation` skill |
