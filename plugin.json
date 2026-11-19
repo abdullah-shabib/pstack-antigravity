@@ -5,9 +5,11 @@
   "description": "If you want to go fast, go deep first. Rigorous engineering playbooks, principles, and multi-model reviews adapted natively for Google Antigravity.",
   "logo": "assets/logo.png",
   "author": {
-    "name": "Lauren Tan (upstream) & Antigravity Maintainers"
+    "name": "Abdullah Shabib (upstream pstack by Lauren Tan)",
+    "url": "https://github.com/abdullah-shabib"
   },
-  "homepage": "https://github.com/cursor/plugins/tree/main/pstack",
+  "homepage": "https://github.com/abdullah-shabib/pstack-antigravity",
+  "repository": "https://github.com/abdullah-shabib/pstack-antigravity",
   "suggestedPrompts": [
     "/setup-pstack — detect my Antigravity models, pick a reasoning budget, and configure pstack roles",
     "/poteto-mode — run a rigorous engineering task with a playbook, verification, and clean diffs",

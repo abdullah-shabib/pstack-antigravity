@@ -15,13 +15,20 @@ See [docs/antigravity-mapping.md](./docs/antigravity-mapping.md) for the complet
 
 ## Install
 
-Link (or copy) this repository into Antigravity's global plugins directory:
+Clone directly into Antigravity's global plugins directory:
 
 ```bash
-ln -s /path/to/pstack_antigravity ~/.gemini/config/plugins/pstack
+git clone https://github.com/abdullah-shabib/pstack-antigravity.git ~/.gemini/config/plugins/pstack
 ```
 
-Or register it in `~/.gemini/config/plugins.json` (or `.agents/plugins.json` for a single repo). Antigravity discovers the plugin automatically and loads its skills on the next turn.
+Or clone anywhere and symlink it (or register it in `~/.gemini/config/plugins.json` / `.agents/plugins.json`):
+
+```bash
+git clone https://github.com/abdullah-shabib/pstack-antigravity.git
+ln -s "$(pwd)/pstack-antigravity" ~/.gemini/config/plugins/pstack
+```
+
+Antigravity discovers the plugin automatically and loads its skills on the next turn.
 
 ## Get started
 
