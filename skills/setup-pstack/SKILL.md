@@ -17,7 +17,7 @@ The subagent/workflow tiers (`inherit`, `pro`, `flash`, `flash_lite`) are always
 
 ### 2. Load current state & resolve strongest-first defaults
 
-pstack defaults to the **strongest available model** on the user's plan (ignoring cost/speed at the `large` budget; `medium`, `small`, and `inherit` are how you tune for quota). Never hardcode a closed list of models — derive **vendor** dynamically from the leading prefix (`gemini-*` = Google, `claude-*` = Anthropic, any other prefix = its own vendor) and **family** by stripping the trailing effort suffix (`-xhigh`, `-high`, `-medium`, `-low`).
+pstack defaults to the **strongest available model** on the user's plan (ignoring cost/speed at the `large` budget; `medium`, `small`, and `inherit` are how you tune for quota). Never hardcode a closed list of models — derive **vendor** dynamically from the leading prefix (`gemini-*` = Google, `claude-*` = Anthropic, any other prefix = its own vendor) and **family** by stripping a trailing effort suffix (`-xhigh`, `-high`, `-medium`, `-low`) when present. Composite slugs with no effort suffix — such as Antigravity's **Orchestrator** models (`gemini-pro-orchestrator-*`, see https://antigravity.google/docs/models#orchestrator) — are their own fixed family under the Google vendor and never have an effort token appended or stripped.
 
 Resolve the default starting table from the step 1 live detected list so newly added models and vendors are picked up automatically, removed models never break setup, and **third-party Claude allowance is conserved** (Claude usage limits on Google Antigravity plans are very tight, so defaults reserve Claude for low-volume, high-leverage read-only cross-vendor judgment rather than heavy parallel code generation):
 
@@ -45,11 +45,11 @@ If `~/.gemini/config/pstack-models.md` already exists, read it and treat its `# 
 
 Each role has a target effort moved by the budget on the ladder `xhigh` > `high` > `medium` > `low`:
 
-- `large` keeps the role's default effort (code roles at `xhigh`, panels and workers at `high`; subagent tiers: code/judgment `inherit`, routine `flash`).
-- `medium` lowers every exact slug one step (`xhigh` → `high`, `high` → `medium`; subagent tiers: code/judgment `inherit`, routine `flash`).
-- `small` lowers every exact slug two steps (`xhigh` → `medium`, `high` → `low`; subagent tiers: code/judgment `flash`, routine `flash_lite`).
+- `large` keeps the role's default standalone frontier model and effort (code roles at `xhigh`, panels and workers at `high`; subagent tiers: code/judgment `inherit`, routine `flash`).
+- `medium` lowers every effort-suffixed slug one step (`xhigh` → `high`, `high` → `medium`; subagent tiers: code/judgment `inherit`, routine `flash`). If an Antigravity **Orchestrator** model (`gemini-pro-orchestrator-*`, preferring Carbon → Neon → Argon) is detected in step 1, offer it as the recommended option for code/execution roles (`feature, refactoring`, `bug-fix`, `perf-issue`, `hillclimb`, `pstack-swarm workers`) — it pairs frontier planning with fast Hydrogen execution and saves quota — while keeping standalone reasoning models for read-only judgment roles (`judgment and prose`, `arena cross-judge pool`).
+- `small` lowers every effort-suffixed slug two steps (`xhigh` → `medium`, `high` → `low`; subagent tiers: code/judgment `flash`, routine `flash_lite`).
 
-No role runs above `xhigh`, and targets at the bottom of the ladder stay there. Set the effort token of each real slug to the role's target. If that exact slug is not in the detected set (for example, if a family tops out at `high` or only exposes `medium`), pick the same family's detected slug with the highest effort at or below the target; otherwise mark the role as needing a choice. Leave `inherit` unchanged.
+No role runs above `xhigh`, and targets at the bottom of the ladder stay there. For slugs with a trailing effort suffix, set the effort token to the role's target; if that exact slug is not in the detected set (for example, if a family tops out at `high` or only exposes `medium`), pick the same family's detected slug with the highest effort at or below the target, otherwise mark the role as needing a choice. Leave `inherit` and fixed composite slugs without an effort suffix (such as `gemini-pro-orchestrator-*`) unchanged across budget shifts.
 
 **(c) Show the roles and confirm.** Present a compact table of every role, its mapped model or tier, and current quota from step 1. Mark any slug not in the detected set as needing a choice. Ask with `ask_question` whether to accept as-is or customize specific roles.
 

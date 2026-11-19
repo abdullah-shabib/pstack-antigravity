@@ -37,9 +37,9 @@ The defaults match the `large` budget and pick the **strongest models available 
 - Multi-model panels (`arena runners`, `interrogate reviewers`): defaults to distinct **Gemini** families (`gemini-4-carbon-high`, `gemini-4-neon-high`, `gemini-4-hydrogen-high`; or `gemini-4-neon-high`, `gemini-4-hydrogen-high`, `gemini-4-argon-high` on plans without Carbon) so heavy parallel runs don't burn through tight Claude allowances on Google plans. You can opt Claude into panel lists during `/setup-pstack` if you want.
 - Cross-vendor judge pool (`arena cross-judge pool`): reserves Claude (when enabled and in-quota) for one low-volume read-only judgment pass (`claude-opus-5-5-high`, `gemini-4-carbon-high`, `gemini-4-neon-high`), falling back cleanly to a distinct Gemini family when Claude quota is depleted or unavailable.
 
-No role runs above `xhigh`. `medium` lowers each role one step (`xhigh` → `high`, `high` → `medium`) and `small` lowers it two steps, spending less quota.
+No role runs above `xhigh`. `medium` lowers effort-suffixed roles one step (`xhigh` → `high`, `high` → `medium`) and can assign an Antigravity **Orchestrator** model (`Orchestrator (Carbon)`, `Orchestrator (Neon)`, or `Orchestrator (Argon)` — see https://antigravity.google/docs/models#orchestrator) to code/execution roles for frontier planning paired with fast Hydrogen execution. `small` lowers roles two steps, spending less quota.
 
-You only override what you care about. A role with no line in `~/.gemini/config/pstack-models.md` keeps the skill's default. To restore a default, delete that role's line. A rerun of `/setup-pstack` keeps your customized roles.
+You only override what you care about. A role with no line in `~/.gemini/config/pstack-models.md` keeps the skill's default. To restore a default, delete that role's line. A rerun of `/setup-pstack` keeps your customized roles (including any fixed Orchestrator slug you chose).
 
 Setting any role to `inherit` runs that role on your parent chat's active model (for panels, `inherit` still counts toward the fan-out size, though an `inherit` entry never acts as a cross-vendor judge). Setup also configures `pstack-swarm workers`, the default model for `/pstack-swarm` when it runs on Antigravity's `swarm` engine.
 
