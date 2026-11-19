@@ -43,7 +43,8 @@ const BUILTIN_ANTIGRAVITY_SKILLS = new Set([
 ]);
 const SKILL_NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const STRAY_CURSOR_RE =
-  /\.cursor\/|pstack-models\.mdc|AskQuestion|generalPurpose|run_in_background|cloud_base_branch|file_attachments|claude-fable|gemini-4-carbon|cursor-team-kit|\/add-plugin|Custom Mode|agent-transcripts|api2\.cursor\.sh|SendToUser|xhigh-fast|high-fast|medium-fast|disable-model-invocation/g;
+  /\.cursor\/|pstack-models\.mdc|AskQuestion|generalPurpose|run_in_background|cloud_base_branch|file_attachments|claude-fable|gemini-4-carbon|cursor-team-kit|\/add-plugin|Custom Mode|agent-transcripts|api2\.cursor\.sh|SendToUser|xhigh-fast|high-fast|medium-fast|disable-model-invocation|cloud (sub)?agent/gi;
+const LEAK_RE = /\/Users\/[a-z0-9_-]+|\/tmp\/cursor-plugins/g;
 const LINK_RE = /\]\(<?([^)\s>]+)>?(?:\s+"[^"]*")?\)/g;
 
 const problems = [];
@@ -173,7 +174,7 @@ for (const agent of agentNames) {
   if (!fm.tools || !fm.tools.startsWith("[")) fail(`agents/${agent}.md must declare an explicit tools list`);
 }
 
-// 4. Stray Cursor references check
+// 4. Stray Cursor references & machine-local leak check
 const mdFiles = [
   join(ROOT, "README.md"),
   ...walk(skillsRoot).filter((p) => p.endsWith(".md")),
@@ -187,9 +188,24 @@ for (const abs of mdFiles) {
   if (hits.length > 0) {
     fail(`${rel} contains stray Cursor-specific term(s): ${hits.join(", ")}`);
   }
+  const leaks = [...new Set([...text.matchAll(LEAK_RE)].map((m) => m[0]))];
+  if (leaks.length > 0) {
+    fail(`${rel} contains machine-local path(s): ${leaks.join(", ")}`);
+  }
 }
 
-// 5. Links & README completeness
+// 4b. Verify UPSTREAM.json nativeOverrides exist
+const upstreamPath = join(ROOT, "UPSTREAM.json");
+if (existsSync(upstreamPath)) {
+  const upstream = JSON.parse(readFileSync(upstreamPath, "utf8"));
+  for (const rel of upstream.nativeOverrides ?? []) {
+    if (!existsSync(join(ROOT, rel))) {
+      fail(`UPSTREAM.json nativeOverrides references missing file: ${rel}`);
+    }
+  }
+}
+
+// 5. Links & README completeness (all markdown files in repo)
 const playbooksRoot = join(skillsRoot, "poteto-mode", "playbooks");
 const playbooks = readdirSync(playbooksRoot)
   .filter((n) => n.endsWith(".md"))
@@ -204,14 +220,20 @@ const docFiles = [
   ...walk(join(ROOT, "docs", "guide"))
     .filter((p) => p.endsWith(".md"))
     .map((p) => relative(ROOT, p)),
+  ...walk(skillsRoot)
+    .filter((p) => p.endsWith(".md"))
+    .map((p) => relative(ROOT, p)),
+  ...walk(agentsRoot)
+    .filter((p) => p.endsWith(".md"))
+    .map((p) => relative(ROOT, p)),
 ];
 
 let linkCount = 0;
 for (const rel of docFiles) {
   const abs = join(ROOT, rel);
-  const body = readFileSync(abs, "utf8");
+  const body = readFileSync(abs, "utf8").replace(/^```[\s\S]*?^```/gm, "");
   for (const [, href] of body.matchAll(LINK_RE)) {
-    if (/^[a-z][a-z0-9+.-]*:/i.test(href)) continue;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith("/")) continue;
     linkCount++;
     const [target, anchor] = href.split("#");
     const resolved = target ? posix.normalize(posix.join(posix.dirname(rel), target)).replace(/\/$/, "") : rel;
