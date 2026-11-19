@@ -1,3 +1,7 @@
+<p align="left">
+  <img src="./assets/logo.png" alt="pstack logo" width="96" />
+</p>
+
 # pstack for Google Antigravity
 
 A maintained, native Google Antigravity port of [Lauren Tan's (`poteto`) `pstack`](https://github.com/cursor/plugins/tree/main/pstack), built around Antigravity's native tools, models, workflows, and swarms.
