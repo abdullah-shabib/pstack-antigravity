@@ -1,0 +1,64 @@
+---
+name: arena
+description: "Spawn N parallel candidates at the same task across multiple models or approaches, cross-judge them, pick a base, and graft the strongest parts of the losers into it. Use for /arena, 'arena this', 'throw it in the arena', or when one attempt at a non-trivial artifact would lock in the wrong shape."
+---
+
+# Arena
+
+Track one checklist item per phase (Frame, Fan out, Cross-judge, Pick, Graft, Verify) before launching anything.
+
+## Phase A: Frame
+
+Every candidate gets the same prompt, so the prompt is the contract.
+
+1. State the artifact each candidate is producing.
+2. Derive the rubric, 3-6 concrete gradeable criteria for what success looks like on *this* task. It is the picker's tool in Phase D. Candidates only see the task.
+3. Read `~/.gemini/config/pstack-models.md` if present and pick the runners from `arena runners`, by default `gemini-4-neon-high`, `claude-opus-5-5-high`, and `gemini-4-hydrogen-high`.
+   - Call `swarm{action:"models", all:true}` to verify each slug is available and has remaining quota.
+   - If every entry is `inherit` (or you want single-model speed), run Phase B via `run_workflow` with `parallel()` and `workspace="share"`.
+   - When entries name distinct exact slugs, run Phase B via Antigravity's `swarm` tool so each candidate is pinned to its exact model.
+   - If a configured slug is unavailable or out of quota, fall back to the nearest valid slug in the same family (`gemini-4-neon`, `gemini-4-hydrogen`, `gemini-4-argon`, `gemini-3.8-flash`, `claude-opus`, `claude-sonnet`, `gpt-oss`) or drop the seat while keeping at least two runners, and say so.
+   - Spawn more candidates for multiple design directions, or repeat one model when the work is generation-bound rather than judgment-sensitive.
+4. Give each candidate its own isolated workspace (`workspace:"share"` or `"branch"` in `swarm` / `run_workflow`, or `/tmp/arena-<slug>/candidate-<n>/` for non-repo artifacts), per the **principle-separate-before-serializing-shared-state** skill.
+
+## Phase B: Fan out
+
+Launch all N candidates in parallel in one turn:
+
+- **Via `swarm` (multi-model):** name the swarm (`swarm{action:"title", title:"arena: <slug>"}`), then call `swarm{action:"add", name:"candidate-<n>", model:"<slug>", workspace:"share", brief:...}` for each candidate (omit `model` for `inherit` entries). Instruct each candidate to post `@coordinator [done]` with its artifact path, commit/diff summary, and short rationale naming alternatives considered and rejected. Wait with `swarm_wait` until all candidates report.
+- **Via `run_workflow` (single-model / `inherit`):** use `parallel()` over the candidate list with `workspace="share"` and a structured `schema` returning `{artifact_path, summary, rationale}`.
+
+Every candidate gets the identical task, the path to shared grounding, its own output path, and instructions to produce the artifact plus a short rationale.
+
+If a candidate produces no output or errors out, proceed with N-1 and note the dropout.
+
+## Phase C: Cross-judge
+
+After all Phase B candidates complete, spawn one read-only judge from the `arena cross-judge pool` line in `~/.gemini/config/pstack-models.md`, by default `claude-opus-5-5-high`, `gemini-4-neon-high`, `gpt-oss-120b-medium`.
+
+- The judge must come from a vendor different from the parent chat's vendor (`gemini-*` = Google, `claude-*` = Anthropic, `gpt-*` = OpenAI/OSS). Pick the first available pool entry with remaining quota from another vendor.
+- An `inherit` entry never cross-judges. If you do not know the parent's vendor, use the first real slug and note that the vendor check did not run.
+- Spawn the judge via `swarm{action:"add", name:"judge", model:"<judge-slug>", workspace:"inherit", brief:...}` with explicit read-only instructions ("do not edit files"). Give it the rubric and each candidate's sanitized path label (`candidate-1`, `candidate-2`, ...) without revealing model names.
+- While you read in Phase D, the judge scores each candidate on each rubric criterion and recommends a base.
+
+## Phase D: Pick a base
+
+Read every candidate end to end before picking. Score each against the rubric criterion by criterion, not on holistic feel, and compare with the cross-judge when Phase C ran one. Agreement on the base confirms the pick. Disagreement means one of you is biased or the rubric was ambiguous. Read both rationales before deciding.
+
+Pick the base a future maintainer can extend most easily without breaking invariants. When two feel tied, prefer the cleaner boundary or smaller API, per **principle-laziness-protocol**.
+
+## Phase E: Graft
+
+Walk each losing candidate once more for what is worth porting into the base, usually one or two things per candidate, not most of it. Fold each graft in by hand, per **principle-redesign-from-first-principles**, so the result stays coherent under one mental model. Don't paste mechanically.
+
+If the candidates converge on one shape, that is strong agreement. Note it and ship the consensus shape without grafting. If they wildly diverge, Phase A was under-specified. Reframe and re-run rather than averaging the divergence.
+
+Clean up temporary swarm workers (`swarm{action:"kill"}`) only after landing or copying the winning candidate's work into your working copy, because `kill` deletes `"share"` / `"branch"` workspaces.
+
+## Phase F: Verify
+
+Verify the synthesized artifact like any other output, per **principle-prove-it-works**. If verification finds a problem the arena missed, either Phase A was wrong (reframe and re-run) or a candidate caught it and you missed the graft (go back to Phase E). Don't paper over it.
+
+## Outputs
+
+One synthesized artifact, with a short synthesis note alongside naming the base and why, the cross-judge's verdict (or that Phase C skipped the judge), each graft with its source candidate, what was rejected and why, any convergence or dropouts, and the verification result.
