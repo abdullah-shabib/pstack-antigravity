@@ -1,6 +1,6 @@
 # pstack for Google Antigravity
 
-A maintained, native Google Antigravity port of [Lauren Tan's (`poteto`) `pstack`](https://github.com/cursor/plugins/tree/main/pstack) — rigorous engineering playbooks, 24 principles, multi-model reviews, and verification workflows built around Antigravity's native tools, models, workflows, and swarms.
+A maintained, native Google Antigravity port of [Lauren Tan's (`poteto`) `pstack`](https://github.com/cursor/plugins/tree/main/pstack), built around Antigravity's native tools, models, workflows, and swarms.
 
 > If you want to go fast, go deep first. The goal is not to maximize lines of code; it is to ship smaller, higher-quality, verified changes you can parallelize with confidence.
 
@@ -189,6 +189,8 @@ This repository tracks upstream `cursor/plugins/pstack` in [`UPSTREAM.json`](./U
   ```bash
   node scripts/sync-upstream.mjs --apply-passthrough
   ```
+
+Ported and adapted for Google Antigravity using **Gemini 4 Neon**.
 
 ## License
 
