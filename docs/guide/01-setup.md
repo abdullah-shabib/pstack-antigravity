@@ -4,13 +4,15 @@ In this page you install the plugin in Google Antigravity, pick which models pst
 
 ## Install the plugin
 
-Clone directly into Antigravity's global plugins folder:
+With the Antigravity CLI:
 
 ```bash
-git clone https://github.com/abdullah-shabib/pstack-antigravity.git ~/.gemini/config/plugins/pstack
+agy plugin install https://github.com/abdullah-shabib/pstack-antigravity
 ```
 
-Or clone elsewhere and symlink it (or register it in `~/.gemini/config/plugins.json` / `.agents/plugins.json` for a single workspace). Antigravity discovers it automatically and loads its skills on the next turn.
+Or in the **Skills & Customizations** sidebar → **Plugins** → install from GitHub URL (`https://github.com/abdullah-shabib/pstack-antigravity`), choosing Global or Workspace scope.
+
+You can also clone directly into `~/.gemini/config/plugins/pstack` (or register it in `~/.gemini/config/plugins.json` / `.agents/plugins.json`). Antigravity discovers it automatically and loads its skills on the next turn.
 
 ## Pick your models
 
