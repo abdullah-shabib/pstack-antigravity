@@ -15,13 +15,7 @@ See [docs/antigravity-mapping.md](./docs/antigravity-mapping.md) for the complet
 
 ## Install
 
-**Antigravity CLI:**
-
-```bash
-agy plugin install https://github.com/abdullah-shabib/pstack-antigravity
-```
-
-**Or clone directly into Antigravity's plugins folder:**
+**Option 1 — Clone directly into Antigravity's plugins folder (recommended, easiest to update):**
 
 ```bash
 # Global (all workspaces)
@@ -31,12 +25,23 @@ git clone https://github.com/abdullah-shabib/pstack-antigravity.git ~/.gemini/co
 git clone https://github.com/abdullah-shabib/pstack-antigravity.git .agents/plugins/pstack
 ```
 
-Antigravity discovers the plugin automatically on the next turn, and it will appear under **Customizations → Installed** where you can toggle it on/off or uninstall it. (The **Customizations → Marketplace** tab only lists published Marketplace plugins; GitHub repos install via `agy plugin install` or `git clone`.)
-
-To update a cloned install later:
+**Option 2 — Clone anywhere and install with the Antigravity CLI (`agy`):**
 
 ```bash
+git clone https://github.com/abdullah-shabib/pstack-antigravity.git
+agy plugin install ./pstack-antigravity
+```
+
+Antigravity discovers the plugin automatically on the next turn and shows it under **Customizations → Installed**, where you can toggle it on/off or uninstall it. (The **Customizations → Marketplace** tab only lists published Marketplace plugins, and `agy plugin install` expects a local directory or Marketplace name rather than a raw GitHub URL.)
+
+**Update later:**
+
+```bash
+# If installed with Option 1
 git -C ~/.gemini/config/plugins/pstack pull
+
+# If installed with Option 2
+git -C ./pstack-antigravity pull && agy plugin install ./pstack-antigravity
 ```
 
 ## Get started

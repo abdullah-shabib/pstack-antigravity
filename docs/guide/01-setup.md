@@ -4,19 +4,20 @@ In this page you install the plugin in Google Antigravity, pick which models pst
 
 ## Install the plugin
 
-With the Antigravity CLI:
-
-```bash
-agy plugin install https://github.com/abdullah-shabib/pstack-antigravity
-```
-
-Or clone directly into your global or workspace plugins directory:
+Clone directly into your global or workspace plugins directory (easiest to keep updated with `git pull`):
 
 ```bash
 git clone https://github.com/abdullah-shabib/pstack-antigravity.git ~/.gemini/config/plugins/pstack
 ```
 
-Antigravity discovers the plugin automatically on the next turn and shows it under **Customizations → Installed** (where you can toggle it on/off or uninstall it). The **Customizations → Marketplace** tab only installs Marketplace catalog plugins, so GitHub plugins use `agy plugin install` or `git clone`.
+Or clone locally and install the directory with the Antigravity CLI:
+
+```bash
+git clone https://github.com/abdullah-shabib/pstack-antigravity.git
+agy plugin install ./pstack-antigravity
+```
+
+Antigravity discovers the plugin automatically on the next turn and shows it under **Customizations → Installed** (where you can toggle it on/off or uninstall it). The **Customizations → Marketplace** tab only installs published Marketplace plugins, and `agy plugin install` takes a local directory or Marketplace name rather than a raw GitHub URL.
 
 ## Pick your models
 
